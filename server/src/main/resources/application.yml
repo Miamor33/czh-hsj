@@ -1,0 +1,52 @@
+spring:
+  application:
+    name: couple-app
+  datasource:
+    url: jdbc:h2:file:./data/couple;MODE=MySQL;DATABASE_TO_LOWER=TRUE;CASE_INSENSITIVE_IDENTIFIERS=TRUE;AUTO_SERVER=TRUE
+    driver-class-name: org.h2.Driver
+    username: sa
+    password:
+  h2:
+    console:
+      enabled: true
+      path: /h2-console
+  sql:
+    init:
+      mode: always
+      schema-locations: classpath:db/schema.sql
+      data-locations: classpath:db/data.sql
+      continue-on-error: false
+  servlet:
+    multipart:
+      max-file-size: 8MB
+      max-request-size: 10MB
+
+server:
+  port: 8080
+
+mybatis-plus:
+  configuration:
+    map-underscore-to-camel-case: true
+  global-config:
+    db-config:
+      id-type: auto
+
+couple:
+  jwt:
+    secret: change-me-to-a-long-random-secret-key-for-couple-app-2026
+    expire-hours: 168
+  upload:
+    dir: ./uploads
+    max-featured: 12
+  partners:
+    czh:
+      display-name: czh
+      password: czh123456
+    hsj:
+      display-name: hsj
+      password: hsj123456
+  together-date: "2024-01-01"
+
+logging:
+  level:
+    com.couple.app: INFO

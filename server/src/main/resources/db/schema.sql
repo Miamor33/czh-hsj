@@ -1,0 +1,73 @@
+CREATE TABLE IF NOT EXISTS partner (
+    id BIGINT PRIMARY KEY AUTO_INCREMENT,
+    partner_key VARCHAR(32) NOT NULL UNIQUE,
+    display_name VARCHAR(64) NOT NULL,
+    password_hash VARCHAR(100) NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE IF NOT EXISTS setting (
+    id BIGINT PRIMARY KEY AUTO_INCREMENT,
+    setting_key VARCHAR(64) NOT NULL UNIQUE,
+    setting_value VARCHAR(512) NOT NULL
+);
+
+CREATE TABLE IF NOT EXISTS anniversary (
+    id BIGINT PRIMARY KEY AUTO_INCREMENT,
+    title VARCHAR(128) NOT NULL,
+    event_date DATE NOT NULL,
+    yearly BOOLEAN NOT NULL DEFAULT TRUE,
+    created_by BIGINT,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE IF NOT EXISTS photo (
+    id BIGINT PRIMARY KEY AUTO_INCREMENT,
+    file_name VARCHAR(128) NOT NULL,
+    caption VARCHAR(512),
+    featured BOOLEAN NOT NULL DEFAULT FALSE,
+    uploaded_by BIGINT,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE IF NOT EXISTS qa_question (
+    id BIGINT PRIMARY KEY AUTO_INCREMENT,
+    content VARCHAR(512) NOT NULL,
+    created_by BIGINT,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE IF NOT EXISTS qa_answer (
+    id BIGINT PRIMARY KEY AUTO_INCREMENT,
+    question_id BIGINT NOT NULL,
+    partner_id BIGINT NOT NULL,
+    content VARCHAR(2000) NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    UNIQUE (question_id, partner_id)
+);
+
+CREATE TABLE IF NOT EXISTS challenge_module (
+    id BIGINT PRIMARY KEY AUTO_INCREMENT,
+    module_key VARCHAR(32) NOT NULL UNIQUE,
+    title VARCHAR(128) NOT NULL,
+    target_count INT NOT NULL,
+    sort_order INT NOT NULL DEFAULT 0
+);
+
+CREATE TABLE IF NOT EXISTS challenge_item (
+    id BIGINT PRIMARY KEY AUTO_INCREMENT,
+    module_id BIGINT NOT NULL,
+    title VARCHAR(256) NOT NULL,
+    sort_order INT NOT NULL DEFAULT 0,
+    extra_hint VARCHAR(256)
+);
+
+CREATE TABLE IF NOT EXISTS challenge_completion (
+    id BIGINT PRIMARY KEY AUTO_INCREMENT,
+    item_id BIGINT NOT NULL UNIQUE,
+    note VARCHAR(1000),
+    photo_file VARCHAR(128),
+    completed_by BIGINT,
+    completed_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);

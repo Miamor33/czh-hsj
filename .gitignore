@@ -1,0 +1,24 @@
+# Maven / IDE
+target/
+.idea/
+*.iml
+.classpath
+.project
+.settings/
+
+# Runtime
+server/data/
+server/uploads/
+uploads/
+*.db
+*.log
+
+# Node
+web/node_modules/
+web/dist/
+
+# OS / env
+.DS_Store
+.env
+.env.local
+application-local.yml
