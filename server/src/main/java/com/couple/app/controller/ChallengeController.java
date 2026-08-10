@@ -38,7 +38,7 @@ public class ChallengeController {
     @PostMapping("/items/{itemId}/complete")
     public ApiResponse<Map<String, Object>> complete(@PathVariable Long itemId,
                                                      @RequestParam(value = "note", required = false) String note,
-                                                     @RequestParam("photos") List<MultipartFile> photos) {
+                                                     @RequestParam(value = "photos", required = false) List<MultipartFile> photos) {
         return ApiResponse.ok(challengeService.complete(itemId, note, photos, AuthSupport.requirePartner().getPartnerId()));
     }
 
