@@ -71,3 +71,10 @@ CREATE TABLE IF NOT EXISTS challenge_completion (
     completed_by BIGINT,
     completed_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
+
+CREATE TABLE IF NOT EXISTS challenge_completion_photo (
+    id BIGINT PRIMARY KEY AUTO_INCREMENT,
+    completion_id BIGINT NOT NULL,
+    file_name VARCHAR(128) NOT NULL,
+    sort_order INT NOT NULL DEFAULT 0
+);
