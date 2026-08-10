@@ -1,5 +1,5 @@
 <script setup>
-import { ref, onMounted, watch } from 'vue'
+import { ref, onMounted, onUnmounted, watch } from 'vue'
 import http from '../api/http'
 
 const moduleLabels = {
@@ -21,6 +21,7 @@ const completePhotos = ref([])
 const completePreviewUrls = ref([])
 const completeLoading = ref(false)
 const lightboxUrl = ref('')
+const fileInputRef = ref(null)
 
 const showAddItem = ref(false)
 const newItemTitle = ref('')
@@ -82,6 +83,14 @@ function cancelComplete() {
   completePhotos.value = []
 }
 
+function openPhotoPicker() {
+  if (completePhotos.value.length >= 3) {
+    error.value = '最多上传 3 张照片'
+    return
+  }
+  fileInputRef.value?.click()
+}
+
 function onPhotoSelect(event) {
   const files = Array.from(event.target.files || [])
   event.target.value = ''
@@ -89,6 +98,8 @@ function onPhotoSelect(event) {
   const merged = [...completePhotos.value, ...files]
   if (merged.length > 3) {
     error.value = '最多上传 3 张照片'
+  } else if (error.value === '最多上传 3 张照片') {
+    error.value = ''
   }
   const next = merged.slice(0, 3)
   revokePreviews()
@@ -101,6 +112,9 @@ function removePhoto(index) {
   revokePreviews()
   completePhotos.value = next
   completePreviewUrls.value = next.map((f) => URL.createObjectURL(f))
+  if (error.value === '最多上传 3 张照片') {
+    error.value = ''
+  }
 }
 
 async function submitComplete(itemId) {
@@ -167,6 +181,8 @@ onMounted(async () => {
   await loadModules()
   await loadItems()
 })
+
+onUnmounted(revokePreviews)
 </script>
 
 <template>
@@ -238,12 +254,28 @@ onMounted(async () => {
             </div>
             <div class="field">
               <label>照片（必填，1–3 张）</label>
-              <input type="file" accept="image/*" multiple @change="onPhotoSelect" />
-              <div v-if="completePreviewUrls.length" class="thumb-grid mt-sm">
+              <input
+                ref="fileInputRef"
+                type="file"
+                accept="image/*"
+                multiple
+                class="sr-only"
+                @change="onPhotoSelect"
+              />
+              <div class="thumb-grid mt-sm">
                 <div v-for="(url, idx) in completePreviewUrls" :key="url" class="thumb-wrap">
                   <img :src="url" class="thumb" alt="预览" />
                   <button type="button" class="thumb-remove" @click="removePhoto(idx)">×</button>
                 </div>
+                <button
+                  v-if="completePhotos.length < 3"
+                  type="button"
+                  class="thumb-add"
+                  @click="openPhotoPicker"
+                >
+                  <span class="thumb-add__plus">+</span>
+                  <span class="thumb-add__hint">{{ completePhotos.length ? '继续添加' : '添加照片' }}</span>
+                </button>
               </div>
             </div>
             <div class="flex-gap">
@@ -373,8 +405,8 @@ onMounted(async () => {
 }
 
 .thumb {
-  width: 72px;
-  height: 72px;
+  width: 80px;
+  height: 80px;
   object-fit: cover;
   border-radius: var(--radius-sm);
   display: block;
@@ -388,11 +420,55 @@ onMounted(async () => {
   height: 22px;
   border-radius: 50%;
   border: none;
-  background: rgba(0, 0, 0, 0.65);
+  background: rgba(42, 37, 32, 0.72);
   color: #fff;
   line-height: 22px;
   font-size: 14px;
   cursor: pointer;
+}
+
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+.thumb-add {
+  width: 80px;
+  height: 80px;
+  border-radius: var(--radius-sm);
+  border: 1.5px dashed rgba(201, 109, 92, 0.45);
+  background: rgba(224, 139, 122, 0.06);
+  color: var(--coral-deep);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+  transition: background 0.15s, border-color 0.15s;
+}
+
+.thumb-add:active {
+  background: rgba(224, 139, 122, 0.14);
+  border-color: var(--coral);
+}
+
+.thumb-add__plus {
+  font-size: 1.35rem;
+  line-height: 1;
+  font-weight: 400;
+}
+
+.thumb-add__hint {
+  font-size: 0.65rem;
+  color: var(--ink-muted);
+  line-height: 1.2;
 }
 
 .lightbox {
