@@ -134,7 +134,7 @@ onMounted(loadPhotos)
   display: flex;
   justify-content: space-between;
   padding: 6px;
-  background: linear-gradient(transparent, rgba(42, 37, 32, 0.55));
+  background: linear-gradient(transparent, rgba(20, 20, 24, 0.58));
 }
 
 .photo-action {

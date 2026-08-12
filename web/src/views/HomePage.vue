@@ -2,8 +2,11 @@
 import { ref, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import http from '../api/http'
+import { useAuthStore } from '../stores/auth'
+import DollDuoStage from '../components/DollDuoStage.vue'
 
 const router = useRouter()
+const auth = useAuthStore()
 
 const loading = ref(true)
 const error = ref('')
@@ -148,6 +151,8 @@ onMounted(loadHome)
     <p v-else-if="error" class="error-banner">{{ error }}</p>
 
     <template v-else-if="home">
+      <DollDuoStage mode="home" :focus-key="auth.partnerKey" :self-name="auth.displayName" />
+
       <section class="card home-days">
         <p class="stat-label">相爱第</p>
         <p class="stat-num">{{ home.loveDays }}</p>
@@ -269,7 +274,18 @@ onMounted(loadHome)
 <style scoped>
 .home-days {
   text-align: center;
-  padding: 24px 16px;
+  padding: 28px 16px 24px;
+  background:
+    radial-gradient(80% 90% at 100% 0%, rgba(74, 111, 181, 0.14), transparent 55%),
+    radial-gradient(70% 80% at 0% 100%, rgba(26, 26, 31, 0.07), transparent 50%),
+    linear-gradient(165deg, rgba(255, 255, 255, 0.96), rgba(243, 246, 252, 0.92));
+}
+
+.home-days .stat-num {
+  background: linear-gradient(120deg, var(--him) 20%, var(--coral-deep) 90%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
 }
 
 .ann-title {
@@ -283,6 +299,9 @@ onMounted(loadHome)
 
 .challenge-row {
   margin-bottom: 14px;
+  padding: 10px 12px;
+  border-radius: 12px;
+  background: rgba(74, 111, 181, 0.04);
 }
 
 .challenge-row:last-child {
@@ -291,11 +310,15 @@ onMounted(loadHome)
 
 .challenge-count {
   font-size: 0.8125rem;
-  color: var(--ink-muted);
+  color: var(--coral-deep);
+  font-weight: 500;
 }
 
 .qa-card {
   cursor: pointer;
+  background:
+    linear-gradient(135deg, rgba(74, 111, 181, 0.08), transparent 50%),
+    linear-gradient(165deg, rgba(255, 255, 255, 0.94), rgba(248, 250, 253, 0.9));
 }
 
 .qa-hint {
@@ -311,10 +334,11 @@ onMounted(loadHome)
   align-items: center;
   justify-content: center;
   border-radius: 50%;
-  background: var(--coral);
+  background: linear-gradient(135deg, var(--coral), var(--coral-deep));
   color: #fff;
   font-size: 0.875rem;
   font-weight: 600;
+  box-shadow: 0 4px 12px rgba(42, 74, 140, 0.3);
 }
 
 .manage-modal {
@@ -323,7 +347,7 @@ onMounted(loadHome)
 
 .divider {
   border: none;
-  border-top: 1px solid rgba(42, 37, 32, 0.08);
+  border-top: 1px solid rgba(20, 20, 24, 0.08);
   margin: 16px 0;
 }
 
@@ -346,7 +370,7 @@ onMounted(loadHome)
 
 .manage-item {
   padding: 10px 0;
-  border-bottom: 1px solid rgba(42, 37, 32, 0.06);
+  border-bottom: 1px solid rgba(20, 20, 24, 0.06);
 }
 
 .manage-item:last-child {

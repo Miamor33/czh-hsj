@@ -262,13 +262,13 @@ onMounted(async () => {
   padding: 14px 16px;
   border-radius: var(--radius);
   background: var(--paper-card);
-  border: 1px solid rgba(42, 37, 32, 0.08);
+  border: 1px solid rgba(26, 26, 31, 0.08);
   transition: border-color 0.2s, box-shadow 0.2s;
 }
 
 .module-chip.active {
   border-color: var(--coral-soft);
-  box-shadow: 0 4px 20px rgba(224, 139, 122, 0.2);
+  box-shadow: 0 6px 22px rgba(42, 74, 140, 0.18);
 }
 
 .module-chip__title {

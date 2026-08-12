@@ -216,11 +216,11 @@ onMounted(loadQuestions)
 }
 
 .qa-answer--mine {
-  background: rgba(224, 139, 122, 0.1);
+  background: rgba(74, 111, 181, 0.1);
 }
 
 .qa-answer--other {
-  background: rgba(42, 37, 32, 0.05);
+  background: rgba(26, 26, 31, 0.05);
 }
 
 .qa-answer__label {
