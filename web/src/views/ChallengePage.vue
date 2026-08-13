@@ -1,5 +1,5 @@
 <script setup>
-import { ref, onMounted, watch } from 'vue'
+import { ref, onMounted, onUnmounted, watch } from 'vue'
 import http from '../api/http'
 
 const moduleLabels = {
@@ -17,12 +17,20 @@ const error = ref('')
 
 const completingId = ref(null)
 const completeNote = ref('')
-const completePhoto = ref(null)
+const completePhotos = ref([])
+const completePreviewUrls = ref([])
 const completeLoading = ref(false)
+const lightboxUrl = ref('')
+const fileInputRef = ref(null)
 
 const showAddItem = ref(false)
 const newItemTitle = ref('')
 const addLoading = ref(false)
+
+function revokePreviews() {
+  completePreviewUrls.value.forEach((u) => URL.revokeObjectURL(u))
+  completePreviewUrls.value = []
+}
 
 async function loadModules() {
   loadingModules.value = true
@@ -64,20 +72,56 @@ function moduleProgress(m) {
 function startComplete(item) {
   completingId.value = item.id
   completeNote.value = ''
-  completePhoto.value = null
+  revokePreviews()
+  completePhotos.value = []
 }
 
 function cancelComplete() {
   completingId.value = null
   completeNote.value = ''
-  completePhoto.value = null
+  revokePreviews()
+  completePhotos.value = []
+}
+
+function openPhotoPicker() {
+  if (completePhotos.value.length >= 3) {
+    error.value = '最多上传 3 张照片'
+    return
+  }
+  fileInputRef.value?.click()
 }
 
 function onPhotoSelect(event) {
-  completePhoto.value = event.target.files?.[0] || null
+  const files = Array.from(event.target.files || [])
+  event.target.value = ''
+  if (!files.length) return
+  const merged = [...completePhotos.value, ...files]
+  if (merged.length > 3) {
+    error.value = '最多上传 3 张照片'
+  } else if (error.value === '最多上传 3 张照片') {
+    error.value = ''
+  }
+  const next = merged.slice(0, 3)
+  revokePreviews()
+  completePhotos.value = next
+  completePreviewUrls.value = next.map((f) => URL.createObjectURL(f))
+}
+
+function removePhoto(index) {
+  const next = completePhotos.value.filter((_, i) => i !== index)
+  revokePreviews()
+  completePhotos.value = next
+  completePreviewUrls.value = next.map((f) => URL.createObjectURL(f))
+  if (error.value === '最多上传 3 张照片') {
+    error.value = ''
+  }
 }
 
 async function submitComplete(itemId) {
+  if (completePhotos.value.length < 1) {
+    error.value = '请至少上传一张照片'
+    return
+  }
   completeLoading.value = true
   error.value = ''
   try {
@@ -85,9 +129,7 @@ async function submitComplete(itemId) {
     if (completeNote.value.trim()) {
       form.append('note', completeNote.value.trim())
     }
-    if (completePhoto.value) {
-      form.append('photo', completePhoto.value)
-    }
+    completePhotos.value.forEach((file) => form.append('photos', file))
     await http.post(`/challenges/items/${itemId}/complete`, form, {
       headers: { 'Content-Type': 'multipart/form-data' },
     })
@@ -139,6 +181,8 @@ onMounted(async () => {
   await loadModules()
   await loadItems()
 })
+
+onUnmounted(revokePreviews)
 </script>
 
 <template>
@@ -186,13 +230,17 @@ onMounted(async () => {
 
         <template v-if="item.completed">
           <p v-if="item.note" class="item-note">{{ item.note }}</p>
-          <img
-            v-if="item.photoUrl"
-            :src="item.photoUrl"
-            alt="完成照片"
-            class="item-photo"
-            loading="lazy"
-          />
+          <div v-if="item.photoUrls?.length" class="thumb-grid">
+            <button
+              v-for="(url, idx) in item.photoUrls"
+              :key="url + idx"
+              type="button"
+              class="thumb-btn"
+              @click="lightboxUrl = url"
+            >
+              <img :src="url" alt="完成照片" class="thumb" loading="lazy" />
+            </button>
+          </div>
           <button class="btn btn--text btn--sm mt-sm" @click="uncomplete(item)">
             取消完成
           </button>
@@ -205,13 +253,35 @@ onMounted(async () => {
               <textarea v-model="completeNote" placeholder="记录一下…" />
             </div>
             <div class="field">
-              <label>照片（可选）</label>
-              <input type="file" accept="image/*" @change="onPhotoSelect" />
+              <label>照片（必填，1–3 张）</label>
+              <input
+                ref="fileInputRef"
+                type="file"
+                accept="image/*"
+                multiple
+                class="sr-only"
+                @change="onPhotoSelect"
+              />
+              <div class="thumb-grid mt-sm">
+                <div v-for="(url, idx) in completePreviewUrls" :key="url" class="thumb-wrap">
+                  <img :src="url" class="thumb" alt="预览" />
+                  <button type="button" class="thumb-remove" @click="removePhoto(idx)">×</button>
+                </div>
+                <button
+                  v-if="completePhotos.length < 3"
+                  type="button"
+                  class="thumb-add"
+                  @click="openPhotoPicker"
+                >
+                  <span class="thumb-add__plus">+</span>
+                  <span class="thumb-add__hint">{{ completePhotos.length ? '继续添加' : '添加照片' }}</span>
+                </button>
+              </div>
             </div>
             <div class="flex-gap">
               <button
                 class="btn btn--primary btn--sm"
-                :disabled="completeLoading"
+                :disabled="completeLoading || completePhotos.length < 1"
                 @click="submitComplete(item.id)"
               >
                 完成
@@ -246,6 +316,11 @@ onMounted(async () => {
           {{ addLoading ? '添加中…' : '添加' }}
         </button>
       </div>
+    </div>
+
+    <div v-if="lightboxUrl" class="lightbox" @click.self="lightboxUrl = ''">
+      <img :src="lightboxUrl" alt="查看大图" class="lightbox__img" />
+      <button type="button" class="btn btn--ghost lightbox__close" @click="lightboxUrl = ''">关闭</button>
     </div>
   </div>
 </template>
@@ -311,11 +386,112 @@ onMounted(async () => {
   color: var(--ink-soft);
 }
 
-.item-photo {
+.thumb-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
   margin-top: 10px;
-  width: 100%;
-  max-height: 200px;
+}
+
+.thumb-btn {
+  padding: 0;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+}
+
+.thumb-wrap {
+  position: relative;
+}
+
+.thumb {
+  width: 80px;
+  height: 80px;
   object-fit: cover;
   border-radius: var(--radius-sm);
+  display: block;
+}
+
+.thumb-remove {
+  position: absolute;
+  top: -6px;
+  right: -6px;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  border: none;
+  background: rgba(42, 37, 32, 0.72);
+  color: #fff;
+  line-height: 22px;
+  font-size: 14px;
+  cursor: pointer;
+}
+
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+.thumb-add {
+  width: 80px;
+  height: 80px;
+  border-radius: var(--radius-sm);
+  border: 1.5px dashed rgba(201, 109, 92, 0.45);
+  background: rgba(224, 139, 122, 0.06);
+  color: var(--coral-deep);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+  transition: background 0.15s, border-color 0.15s;
+}
+
+.thumb-add:active {
+  background: rgba(224, 139, 122, 0.14);
+  border-color: var(--coral);
+}
+
+.thumb-add__plus {
+  font-size: 1.35rem;
+  line-height: 1;
+  font-weight: 400;
+}
+
+.thumb-add__hint {
+  font-size: 0.65rem;
+  color: var(--ink-muted);
+  line-height: 1.2;
+}
+
+.lightbox {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  background: rgba(0, 0, 0, 0.75);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+}
+
+.lightbox__img {
+  max-width: 100%;
+  max-height: 80vh;
+  object-fit: contain;
+  border-radius: var(--radius-sm);
+}
+
+.lightbox__close {
+  margin-top: 12px;
+  color: #fff;
 }
 </style>

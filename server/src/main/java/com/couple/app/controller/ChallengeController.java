@@ -38,8 +38,8 @@ public class ChallengeController {
     @PostMapping("/items/{itemId}/complete")
     public ApiResponse<Map<String, Object>> complete(@PathVariable Long itemId,
                                                      @RequestParam(value = "note", required = false) String note,
-                                                     @RequestParam(value = "photo", required = false) MultipartFile photo) {
-        return ApiResponse.ok(challengeService.complete(itemId, note, photo, AuthSupport.requirePartner().getPartnerId()));
+                                                     @RequestParam(value = "photos", required = false) List<MultipartFile> photos) {
+        return ApiResponse.ok(challengeService.complete(itemId, note, photos, AuthSupport.requirePartner().getPartnerId()));
     }
 
     @DeleteMapping("/items/{itemId}/complete")
