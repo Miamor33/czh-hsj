@@ -7,6 +7,8 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.multipart.MaxUploadSizeExceededException;
+import org.springframework.web.multipart.MultipartException;
 
 @RestControllerAdvice
 public class GlobalExceptionHandler {
@@ -31,6 +33,18 @@ public class GlobalExceptionHandler {
     @ResponseStatus(HttpStatus.UNAUTHORIZED)
     public ApiResponse<Void> handleAuth(Exception e) {
         return ApiResponse.fail(401, "未登录或登录已过期");
+    }
+
+    @ExceptionHandler(MaxUploadSizeExceededException.class)
+    @ResponseStatus(HttpStatus.OK)
+    public ApiResponse<Void> handleTooLarge(MaxUploadSizeExceededException e) {
+        return ApiResponse.fail("照片太大，单张不超过 8MB，一次总共不超过 24MB");
+    }
+
+    @ExceptionHandler(MultipartException.class)
+    @ResponseStatus(HttpStatus.OK)
+    public ApiResponse<Void> handleMultipart(MultipartException e) {
+        return ApiResponse.fail("照片上传失败，请改用 jpg/png/webp 后重试");
     }
 
     @ExceptionHandler(Exception.class)

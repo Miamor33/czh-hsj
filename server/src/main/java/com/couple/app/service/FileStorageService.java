@@ -27,6 +27,10 @@ public class FileStorageService {
             throw new BusinessException("请选择图片");
         }
         String contentType = file.getContentType() == null ? "" : file.getContentType().toLowerCase();
+        if (contentType.contains("heic") || contentType.contains("heif")
+                || originalNameLooksLike(file.getOriginalFilename(), ".heic", ".heif")) {
+            throw new BusinessException("不支持 iPhone HEIC，请先转为 jpg 再上传");
+        }
         if (!ALLOWED.contains(contentType) && !looksLikeImage(file.getOriginalFilename())) {
             throw new BusinessException("仅支持 jpg/png/webp");
         }
@@ -57,12 +61,21 @@ public class FileStorageService {
         }
     }
 
-    private boolean looksLikeImage(String name) {
+    private boolean originalNameLooksLike(String name, String... suffixes) {
         if (name == null) {
             return false;
         }
         String lower = name.toLowerCase();
-        return lower.endsWith(".jpg") || lower.endsWith(".jpeg") || lower.endsWith(".png") || lower.endsWith(".webp");
+        for (String suffix : suffixes) {
+            if (lower.endsWith(suffix)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private boolean looksLikeImage(String name) {
+        return originalNameLooksLike(name, ".jpg", ".jpeg", ".png", ".webp");
     }
 
     private String extension(String original, String contentType) {

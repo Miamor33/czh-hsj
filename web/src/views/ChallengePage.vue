@@ -88,7 +88,9 @@ function openPhotoPicker() {
     error.value = '最多上传 3 张照片'
     return
   }
-  fileInputRef.value?.click()
+  const el = fileInputRef.value
+  const input = Array.isArray(el) ? el[0] : el
+  input?.click()
 }
 
 function onPhotoSelect(event) {
@@ -131,7 +133,7 @@ async function submitComplete(itemId) {
     }
     completePhotos.value.forEach((file) => form.append('photos', file))
     await http.post(`/challenges/items/${itemId}/complete`, form, {
-      headers: { 'Content-Type': 'multipart/form-data' },
+      timeout: 60000,
     })
     cancelComplete()
     await loadModules()
@@ -212,6 +214,15 @@ onUnmounted(revokePreviews)
       <button class="btn btn--ghost btn--sm" @click="showAddItem = true">添加</button>
     </div>
 
+    <input
+      ref="fileInputRef"
+      type="file"
+      accept="image/jpeg,image/png,image/webp,image/*"
+      multiple
+      class="sr-only"
+      @change="onPhotoSelect"
+    />
+
     <p v-if="error" class="error-banner">{{ error }}</p>
     <div v-if="loadingItems" class="loading">加载中…</div>
 
@@ -253,15 +264,7 @@ onUnmounted(revokePreviews)
               <textarea v-model="completeNote" placeholder="记录一下…" />
             </div>
             <div class="field">
-              <label>照片（必填，1–3 张）</label>
-              <input
-                ref="fileInputRef"
-                type="file"
-                accept="image/*"
-                multiple
-                class="sr-only"
-                @change="onPhotoSelect"
-              />
+              <label>照片（必填，1–3 张，jpg/png/webp）</label>
               <div class="thumb-grid mt-sm">
                 <div v-for="(url, idx) in completePreviewUrls" :key="url" class="thumb-wrap">
                   <img :src="url" class="thumb" alt="预览" />
