@@ -1,6 +1,8 @@
 # 占位模型（可替换）
 
-- `czh.glb` → 男主钩织玩偶（当前为 Astronaut 占位）
-- `hsj.glb` → 女主钩织玩偶（当前为 RobotExpressive 占位）
+- `czh.glb` → 男主默认玩偶
+- `hsj.glb` → 女主默认玩偶
+- `czhr.glb` → 男主 r 变体（双击切换）
+- `hsjr.glb` → 女主 r 变体（双击切换）
 
 替换时保持文件名不变即可。
