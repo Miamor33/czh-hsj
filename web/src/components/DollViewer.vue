@@ -14,13 +14,16 @@ const props = defineProps({
   bubble: { type: String, default: '' },
 })
 
-const emit = defineEmits(['select'])
+const emit = defineEmits(['select', 'dblselect'])
 
 const meta = computed(() => DOLL_META[props.who] || DOLL_META.czh)
 const viewerRef = ref(null)
 const pointerDown = ref(null)
 const hopping = ref(false)
 let hopTimer = 0
+const DBL_MS = 300
+let lastTapAt = 0
+let singleTapTimer = 0
 
 onMounted(() => {
   import('@google/model-viewer')
@@ -93,10 +96,25 @@ function onPointerUp(event) {
   if (!start) return
   const dx = Math.abs(event.clientX - start.x)
   const dy = Math.abs(event.clientY - start.y)
-  if (dx < 10 && dy < 10 && Date.now() - start.t < 450) {
+  if (dx >= 10 || dy >= 10 || Date.now() - start.t >= 450) return
+
+  const now = Date.now()
+  if (lastTapAt && now - lastTapAt < DBL_MS) {
+    window.clearTimeout(singleTapTimer)
+    singleTapTimer = 0
+    lastTapAt = 0
+    playHop()
+    emit('dblselect', props.who)
+    return
+  }
+
+  lastTapAt = now
+  window.clearTimeout(singleTapTimer)
+  singleTapTimer = window.setTimeout(() => {
+    singleTapTimer = 0
     playHop()
     emit('select', props.who)
-  }
+  }, DBL_MS)
 }
 
 /** 点击轻跳一下，不改相机距离 */
