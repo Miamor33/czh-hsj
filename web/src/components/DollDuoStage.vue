@@ -2,7 +2,7 @@
 import { computed, ref } from 'vue'
 import { storeToRefs } from 'pinia'
 import DollViewer from './DollViewer.vue'
-import { DOLL_META, otherPartnerKey } from '../dolls/meta'
+import { DOLL_META, otherPartnerKey, toBaseKey, toggleVariantKey } from '../dolls/meta'
 import { useDollStore } from '../stores/doll'
 
 const props = defineProps({
@@ -16,6 +16,8 @@ const props = defineProps({
 const dollStore = useDollStore()
 const { rotating } = storeToRefs(dollStore)
 const bubbleMap = ref({ czh: '', hsj: '' })
+/** 当前舞台变体；仅内存，不跨页面共享 */
+const variantMap = ref({ czh: 'czh', hsj: 'hsj' })
 const mainRef = ref(null)
 const asideRef = ref(null)
 const coverLeftRef = ref(null)
@@ -23,6 +25,10 @@ const coverRightRef = ref(null)
 
 const mainWho = computed(() => props.focusKey || 'czh')
 const asideWho = computed(() => otherPartnerKey(mainWho.value))
+const coverLeftWho = computed(() => variantMap.value.czh)
+const coverRightWho = computed(() => variantMap.value.hsj)
+const mainVariantWho = computed(() => variantMap.value[mainWho.value] || mainWho.value)
+const asideVariantWho = computed(() => variantMap.value[asideWho.value] || asideWho.value)
 
 function clearBubblesSoon() {
   window.clearTimeout(clearBubblesSoon._t)
@@ -32,14 +38,15 @@ function clearBubblesSoon() {
 }
 
 function onSelect(who) {
-  const meta = DOLL_META[who]
+  const base = toBaseKey(who)
+  const meta = DOLL_META[who] || DOLL_META[base]
   if (!meta) return
 
   if (props.mode === 'cover') {
     bubbleMap.value = {
       czh: '',
       hsj: '',
-      [who]: `${meta.name} · ${meta.role}`,
+      [base]: `${meta.name} · ${meta.role}`,
     }
     clearBubblesSoon()
     return
@@ -48,11 +55,22 @@ function onSelect(who) {
   bubbleMap.value = {
     czh: '',
     hsj: '',
-    [who]: who === props.focusKey
+    [base]: base === props.focusKey
       ? `${meta.greet}·${props.selfName || meta.name}`
       : `${meta.miss}`,
   }
   clearBubblesSoon()
+}
+
+function onDblSelect(who) {
+  const base = toBaseKey(who)
+  // home 模式仅大模型可换；aside 即使误触也不处理
+  if (props.mode === 'home' && base !== mainWho.value) return
+  const current = variantMap.value[base] || base
+  variantMap.value = {
+    ...variantMap.value,
+    [base]: toggleVariantKey(current),
+  }
 }
 
 function toggleRotate() {
@@ -79,38 +97,41 @@ function resetCameras() {
       <template v-if="mode === 'cover'">
         <DollViewer
           ref="coverLeftRef"
-          who="czh"
+          :who="coverLeftWho"
           size="equal"
           :rotating="rotating"
           :allow-zoom="false"
           :bubble="bubbleMap.czh"
           @select="onSelect"
+          @dblselect="onDblSelect"
         />
         <DollViewer
           ref="coverRightRef"
-          who="hsj"
+          :who="coverRightWho"
           size="equal"
           :rotating="rotating"
           :allow-zoom="false"
           :bubble="bubbleMap.hsj"
           @select="onSelect"
+          @dblselect="onDblSelect"
         />
       </template>
       <template v-else>
         <DollViewer
           ref="mainRef"
           class="duo__main"
-          :who="mainWho"
+          :who="mainVariantWho"
           size="focus"
           :rotating="rotating"
           :allow-zoom="false"
           :bubble="bubbleMap[mainWho]"
           @select="onSelect"
+          @dblselect="onDblSelect"
         />
         <DollViewer
           ref="asideRef"
           class="duo__aside"
-          :who="asideWho"
+          :who="asideVariantWho"
           size="aside"
           :rotating="rotating"
           :allow-zoom="false"
