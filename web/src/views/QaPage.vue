@@ -1,6 +1,9 @@
 <script setup>
 import { ref, onMounted } from 'vue'
+import { useRouter } from 'vue-router'
 import http from '../api/http'
+
+const router = useRouter()
 
 const filters = [
   { key: 'pending_me', label: '待我回答' },
@@ -17,10 +20,6 @@ const activeFilter = ref('pending_me')
 const showAdd = ref(false)
 const newQuestion = ref('')
 const addLoading = ref(false)
-
-const answeringId = ref(null)
-const answerText = ref('')
-const answerLoading = ref(false)
 
 async function loadQuestions() {
   loading.value = true
@@ -55,34 +54,8 @@ function statusClass(status) {
   return 'chip--pending'
 }
 
-function startAnswer(item) {
-  answeringId.value = item.id
-  answerText.value = item.myAnswer || ''
-}
-
-function cancelAnswer() {
-  answeringId.value = null
-  answerText.value = ''
-}
-
-async function submitAnswer(id) {
-  if (!answerText.value.trim()) {
-    error.value = '请输入答案'
-    return
-  }
-  answerLoading.value = true
-  error.value = ''
-  try {
-    await http.post(`/qa/questions/${id}/answer`, {
-      content: answerText.value.trim(),
-    })
-    cancelAnswer()
-    await loadQuestions()
-  } catch (e) {
-    error.value = e.message
-  } finally {
-    answerLoading.value = false
-  }
+function openDetail(item) {
+  router.push(`/app/qa/${item.id}`)
 }
 
 async function submitQuestion() {
@@ -131,46 +104,22 @@ onMounted(loadQuestions)
     <div v-if="loading" class="loading">加载中…</div>
 
     <div v-else-if="questions.length">
-      <div v-for="item in questions" :key="item.id" class="card qa-item">
-        <div class="flex-between mb-md">
-          <span :class="['chip', statusClass(item.status)]">{{ statusLabel(item.status) }}</span>
+      <button
+        v-for="item in questions"
+        :key="item.id"
+        type="button"
+        class="card qa-item"
+        @click="openDetail(item)"
+      >
+        <div class="qa-item__top">
+          <div class="qa-item__left">
+            <span class="qa-item__badge">Q{{ item.questionIndex }}</span>
+            <span :class="['chip', statusClass(item.status)]">{{ statusLabel(item.status) }}</span>
+          </div>
+          <span class="qa-item__arrow" aria-hidden="true">›</span>
         </div>
         <p class="qa-question">{{ item.content }}</p>
-
-        <div v-if="item.myAnswer" class="qa-answer qa-answer--mine">
-          <p class="qa-answer__label">我的回答</p>
-          <p>{{ item.myAnswer }}</p>
-        </div>
-
-        <div v-if="item.status === 'done' && item.otherAnswer" class="qa-answer qa-answer--other">
-          <p class="qa-answer__label">{{ item.otherName || '对方' }}的回答</p>
-          <p>{{ item.otherAnswer }}</p>
-        </div>
-        <p v-else-if="item.status === 'pending_other' && item.myAnswer" class="qa-wait">
-          已回答，等待对方…
-        </p>
-
-        <div v-if="item.status === 'pending_me'" class="mt-md">
-          <div v-if="answeringId === item.id">
-            <div class="field">
-              <textarea v-model="answerText" placeholder="写下你的回答…" />
-            </div>
-            <div class="flex-gap">
-              <button
-                class="btn btn--primary btn--sm"
-                :disabled="answerLoading"
-                @click="submitAnswer(item.id)"
-              >
-                提交
-              </button>
-              <button class="btn btn--ghost btn--sm" @click="cancelAnswer">取消</button>
-            </div>
-          </div>
-          <button v-else class="btn btn--primary btn--sm" @click="startAnswer(item)">
-            回答
-          </button>
-        </div>
-      </div>
+      </button>
     </div>
     <p v-else class="empty">暂无问题</p>
 
@@ -199,40 +148,60 @@ onMounted(loadQuestions)
 
 <style scoped>
 .qa-item {
-  margin-bottom: 12px;
+  display: block;
+  width: 100%;
+  text-align: left;
+  margin-bottom: 0;
+  cursor: pointer;
+  border: none;
+  font: inherit;
+  color: inherit;
+}
+
+.qa-item + .qa-item {
+  margin-top: 12px;
+}
+
+.qa-item__top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 10px;
+}
+
+.qa-item__left {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.qa-item__badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 36px;
+  height: 24px;
+  padding: 0 8px;
+  border-radius: 999px;
+  background: linear-gradient(135deg, var(--him) 0%, var(--coral) 100%);
+  color: #fff;
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+}
+
+.qa-item__arrow {
+  color: var(--coral-soft);
+  font-size: 1.25rem;
+  line-height: 1;
 }
 
 .qa-question {
   font-size: 1rem;
   font-weight: 500;
   line-height: 1.6;
-}
-
-.qa-answer {
-  margin-top: 12px;
-  padding: 12px;
-  border-radius: var(--radius-sm);
-  font-size: 0.9rem;
-}
-
-.qa-answer--mine {
-  background: rgba(74, 111, 181, 0.1);
-}
-
-.qa-answer--other {
-  background: rgba(26, 26, 31, 0.05);
-}
-
-.qa-answer__label {
-  font-size: 0.75rem;
-  color: var(--ink-muted);
-  margin-bottom: 4px;
-}
-
-.qa-wait {
-  margin-top: 12px;
-  font-size: 0.8125rem;
-  color: var(--ink-muted);
-  font-style: italic;
+  margin: 0;
+  color: var(--him);
+  padding-left: 4px;
 }
 </style>

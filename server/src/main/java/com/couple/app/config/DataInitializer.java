@@ -5,6 +5,7 @@ import com.couple.app.entity.*;
 import com.couple.app.mapper.*;
 import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
+import org.springframework.core.annotation.Order;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 
@@ -14,6 +15,7 @@ import java.util.List;
 import java.util.Map;
 
 @Component
+@Order(80)
 public class DataInitializer implements ApplicationRunner {
     private final CoupleProperties properties;
     private final PasswordEncoder passwordEncoder;
@@ -84,32 +86,7 @@ public class DataInitializer implements ApplicationRunner {
     }
 
     private void seedQuestions() {
-        if (qaQuestionMapper.selectCount(null) > 0) {
-            return;
-        }
-        List<String> questions = List.of(
-                "第一次见面时，对方给你留下的印象是什么？",
-                "你最喜欢对方的一个小习惯是什么？",
-                "如果用一种食物形容我们的关系，会是什么？",
-                "对方做过的最让你感动的一件事是？",
-                "你希望我们一起去的下一个城市是哪里？",
-                "吵架之后，你更希望对方怎么做？",
-                "你觉得我们最像哪部电影里的情侣？",
-                "对方哪一句口头禅你记得最清楚？",
-                "如果明天是假期，你最想一起做什么？",
-                "你最想被对方夸奖的一点是什么？",
-                "我们之间有什么只有彼此知道的暗号吗？",
-                "你觉得恋爱里最重要的三件事是什么？",
-                "对方穿什么风格你最心动？",
-                "你想和对方一起养成的一个习惯是？",
-                "如果给这段关系写一句宣传语，你会写什么？"
-        );
-        for (String q : questions) {
-            QaQuestion item = new QaQuestion();
-            item.setContent(q);
-            item.setCreatedAt(LocalDateTime.now());
-            qaQuestionMapper.insert(item);
-        }
+        // 题库由 SukiQaImportRunner 一次性导入，此处不再种占位题
     }
 
     private void seedChallenges() {

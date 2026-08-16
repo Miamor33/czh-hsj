@@ -28,6 +28,12 @@ const routes = [
         component: () => import('../views/QaPage.vue'),
       },
       {
+        path: 'qa/:id',
+        name: 'qa-detail',
+        component: () => import('../views/QaDetailPage.vue'),
+        meta: { hideChrome: true },
+      },
+      {
         path: 'challenges',
         name: 'challenges',
         component: () => import('../views/ChallengePage.vue'),

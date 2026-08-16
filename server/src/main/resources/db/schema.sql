@@ -47,6 +47,14 @@ CREATE TABLE IF NOT EXISTS qa_answer (
     UNIQUE (question_id, partner_id)
 );
 
+CREATE TABLE IF NOT EXISTS qa_reply (
+    id BIGINT PRIMARY KEY AUTO_INCREMENT,
+    question_id BIGINT NOT NULL,
+    partner_id BIGINT NOT NULL,
+    content VARCHAR(2000) NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
 CREATE TABLE IF NOT EXISTS challenge_module (
     id BIGINT PRIMARY KEY AUTO_INCREMENT,
     module_key VARCHAR(32) NOT NULL UNIQUE,

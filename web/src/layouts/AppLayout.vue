@@ -14,6 +14,8 @@ const tabs = [
   { name: 'challenges', path: '/app/challenges', label: '挑战', icon: '★' },
 ]
 
+const hideChrome = computed(() => !!route.meta.hideChrome)
+
 const activeTab = computed(() => {
   if (route.path.startsWith('/app/album')) return 'album'
   if (route.path.startsWith('/app/qa')) return 'qa'
@@ -23,6 +25,15 @@ const activeTab = computed(() => {
 
 function goTab(tab) {
   router.push(tab.path)
+}
+
+function logout() {
+  const audio = audioRef.value
+  if (audio) {
+    audio.pause()
+  }
+  auth.logout()
+  router.replace('/')
 }
 
 const audioRef = ref(null)
@@ -66,12 +77,15 @@ onMounted(async () => {
 </script>
 
 <template>
-  <div class="app-layout">
-    <header class="app-header">
+  <div class="app-layout" :class="{ 'app-layout--immersive': hideChrome }">
+    <header v-if="!hideChrome" class="app-header">
       <span class="app-header__brand">czh & hsj</span>
-      <span class="app-header__user">{{ auth.displayName }}</span>
+      <div class="app-header__right">
+        <span class="app-header__user">{{ auth.displayName }}</span>
+        <button type="button" class="app-header__logout" @click="logout">退出登录</button>
+      </div>
     </header>
-    <main class="page page--with-tab">
+    <main class="page" :class="{ 'page--with-tab': !hideChrome }">
       <router-view />
     </main>
 
@@ -80,7 +94,7 @@ onMounted(async () => {
     <button
       type="button"
       class="bgm-toggle"
-      :class="{ 'bgm-toggle--off': !soundOn }"
+      :class="{ 'bgm-toggle--off': !soundOn, 'bgm-toggle--immersive': hideChrome }"
       :aria-label="soundOn ? '关闭背景音乐' : '开启背景音乐'"
       :title="soundOn ? '关闭音乐' : '开启音乐'"
       @click="toggleBgm"
@@ -88,7 +102,7 @@ onMounted(async () => {
       <span class="bgm-toggle__icon" aria-hidden="true">♪</span>
     </button>
 
-    <nav class="tabs">
+    <nav v-if="!hideChrome" class="tabs">
       <button
         v-for="tab in tabs"
         :key="tab.name"
@@ -131,6 +145,12 @@ onMounted(async () => {
   color: transparent;
 }
 
+.app-header__right {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
 .app-header__user {
   font-size: 0.75rem;
   color: var(--coral-deep);
@@ -139,6 +159,19 @@ onMounted(async () => {
   border-radius: 999px;
   background: rgba(74, 111, 181, 0.1);
   border: 1px solid rgba(74, 111, 181, 0.12);
+}
+
+.app-header__logout {
+  border: none;
+  background: transparent;
+  color: var(--ink-muted, #8a8a93);
+  font-size: 0.75rem;
+  padding: 4px 6px;
+  cursor: pointer;
+}
+
+.app-header__logout:active {
+  opacity: 0.7;
 }
 
 .bgm-toggle {
@@ -169,6 +202,10 @@ onMounted(async () => {
 .bgm-toggle--off {
   color: var(--ink-muted);
   opacity: 0.85;
+}
+
+.bgm-toggle--immersive {
+  bottom: calc(16px + var(--safe-bottom, 0px));
 }
 
 .bgm-toggle--off .bgm-toggle__icon {

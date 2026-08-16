@@ -24,6 +24,11 @@ public class QaController {
         return ApiResponse.ok(qaService.list(AuthSupport.requirePartner().getPartnerId(), filter));
     }
 
+    @GetMapping("/questions/{id}")
+    public ApiResponse<Map<String, Object>> detail(@PathVariable Long id) {
+        return ApiResponse.ok(qaService.detail(id, AuthSupport.requirePartner().getPartnerId()));
+    }
+
     @PostMapping("/questions")
     public ApiResponse<QaQuestion> add(@RequestBody ContentRequest req) {
         return ApiResponse.ok(qaService.addQuestion(req.getContent(), AuthSupport.requirePartner().getPartnerId()));
@@ -32,6 +37,18 @@ public class QaController {
     @PostMapping("/questions/{id}/answer")
     public ApiResponse<Void> answer(@PathVariable Long id, @RequestBody ContentRequest req) {
         qaService.answer(id, req.getContent(), AuthSupport.requirePartner().getPartnerId());
+        return ApiResponse.ok();
+    }
+
+    @PostMapping("/questions/{id}/replies")
+    public ApiResponse<Void> reply(@PathVariable Long id, @RequestBody ContentRequest req) {
+        qaService.reply(id, req.getContent(), AuthSupport.requirePartner().getPartnerId());
+        return ApiResponse.ok();
+    }
+
+    @PostMapping("/questions/{id}/nudge")
+    public ApiResponse<Void> nudge(@PathVariable Long id) {
+        qaService.nudge(id, AuthSupport.requirePartner().getPartnerId());
         return ApiResponse.ok();
     }
 
