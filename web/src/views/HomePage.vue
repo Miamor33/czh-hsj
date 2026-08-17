@@ -276,20 +276,24 @@ onMounted(loadHome)
   text-align: center;
   padding: 28px 16px 24px;
   background:
-    radial-gradient(80% 90% at 100% 0%, rgba(74, 111, 181, 0.14), transparent 55%),
-    radial-gradient(70% 80% at 0% 100%, rgba(26, 26, 31, 0.07), transparent 50%),
-    linear-gradient(165deg, rgba(255, 255, 255, 0.96), rgba(243, 246, 252, 0.92));
+    radial-gradient(80% 90% at 100% 0%, rgba(255, 143, 171, 0.22), transparent 55%),
+    radial-gradient(70% 80% at 0% 100%, rgba(91, 127, 209, 0.14), transparent 50%),
+    radial-gradient(40% 40% at 50% 50%, rgba(255, 214, 165, 0.25), transparent 70%),
+    linear-gradient(165deg, rgba(255, 255, 255, 0.98), rgba(255, 240, 244, 0.94));
+  border-color: rgba(255, 143, 171, 0.35);
 }
 
 .home-days .stat-num {
-  background: linear-gradient(120deg, var(--him) 20%, var(--coral-deep) 90%);
+  background: linear-gradient(120deg, var(--him) 10%, var(--blush) 50%, var(--coral-deep) 95%);
   -webkit-background-clip: text;
   background-clip: text;
   color: transparent;
+  animation: heart-pulse 3s ease-in-out infinite;
 }
 
 .ann-title {
-  font-weight: 500;
+  font-weight: 700;
+  font-family: var(--font-display);
 }
 
 .ann-meta {
@@ -299,9 +303,18 @@ onMounted(loadHome)
 
 .challenge-row {
   margin-bottom: 14px;
-  padding: 10px 12px;
-  border-radius: 12px;
-  background: rgba(74, 111, 181, 0.04);
+  padding: 12px 14px;
+  border-radius: 16px;
+  background: linear-gradient(135deg, rgba(255, 194, 209, 0.2), rgba(168, 189, 232, 0.18));
+  border: 1.5px solid rgba(255, 255, 255, 0.7);
+}
+
+.challenge-row:nth-child(2) {
+  background: linear-gradient(135deg, rgba(184, 242, 230, 0.3), rgba(255, 243, 176, 0.25));
+}
+
+.challenge-row:nth-child(3) {
+  background: linear-gradient(135deg, rgba(168, 189, 232, 0.28), rgba(255, 194, 209, 0.2));
 }
 
 .challenge-row:last-child {
@@ -311,14 +324,14 @@ onMounted(loadHome)
 .challenge-count {
   font-size: 0.8125rem;
   color: var(--coral-deep);
-  font-weight: 500;
+  font-weight: 800;
 }
 
 .qa-card {
   cursor: pointer;
   background:
-    linear-gradient(135deg, rgba(74, 111, 181, 0.08), transparent 50%),
-    linear-gradient(165deg, rgba(255, 255, 255, 0.94), rgba(248, 250, 253, 0.9));
+    linear-gradient(135deg, rgba(255, 143, 171, 0.14), transparent 48%),
+    linear-gradient(165deg, rgba(255, 255, 255, 0.97), rgba(245, 248, 255, 0.94));
 }
 
 .qa-hint {
@@ -328,17 +341,18 @@ onMounted(loadHome)
 }
 
 .qa-badge {
-  min-width: 28px;
-  height: 28px;
+  min-width: 30px;
+  height: 30px;
   display: flex;
   align-items: center;
   justify-content: center;
   border-radius: 50%;
-  background: linear-gradient(135deg, var(--coral), var(--coral-deep));
+  background: linear-gradient(135deg, var(--blush), var(--coral));
   color: #fff;
   font-size: 0.875rem;
-  font-weight: 600;
-  box-shadow: 0 4px 12px rgba(42, 74, 140, 0.3);
+  font-weight: 800;
+  box-shadow: 0 4px 0 rgba(61, 95, 173, 0.2), 0 8px 16px rgba(255, 143, 171, 0.35);
+  animation: heart-pulse 2s ease-in-out infinite;
 }
 
 .manage-modal {
@@ -347,7 +361,7 @@ onMounted(loadHome)
 
 .divider {
   border: none;
-  border-top: 1px solid rgba(20, 20, 24, 0.08);
+  border-top: 2px dashed rgba(255, 194, 209, 0.55);
   margin: 16px 0;
 }
 
@@ -355,6 +369,7 @@ onMounted(loadHome)
   font-size: 0.8125rem;
   color: var(--ink-muted);
   margin-bottom: 10px;
+  font-weight: 700;
 }
 
 .checkbox-label {
@@ -370,7 +385,7 @@ onMounted(loadHome)
 
 .manage-item {
   padding: 10px 0;
-  border-bottom: 1px solid rgba(20, 20, 24, 0.06);
+  border-bottom: 1px dashed rgba(255, 194, 209, 0.45);
 }
 
 .manage-item:last-child {

@@ -225,30 +225,41 @@ defineExpose({ playHop, resetFraming })
   transform: translate(-50%, -100%);
   z-index: 3;
   max-width: 92%;
-  padding: 7px 11px;
-  border-radius: 10px;
-  background: rgba(255, 255, 255, 0.82);
-  border: none;
-  box-shadow: 0 6px 20px rgba(20, 20, 28, 0.08);
+  padding: 8px 12px;
+  border-radius: 18px 18px 18px 6px;
+  background: linear-gradient(160deg, #fff 0%, #ffeef2 100%);
+  border: 2px solid rgba(255, 194, 209, 0.75);
+  box-shadow: 0 5px 0 rgba(255, 143, 171, 0.18), 0 10px 20px rgba(91, 127, 209, 0.1);
   backdrop-filter: blur(8px);
   font-size: 0.78rem;
+  font-weight: 700;
   color: var(--ink);
   white-space: nowrap;
-  animation: bubble-in 0.25s ease;
+  animation: bubble-in 0.3s cubic-bezier(0.22, 1.5, 0.36, 1);
 }
 
 .doll__bubble::after {
-  display: none;
+  content: '';
+  position: absolute;
+  left: 18px;
+  bottom: -7px;
+  width: 12px;
+  height: 12px;
+  background: #ffeef2;
+  border-right: 2px solid rgba(255, 194, 209, 0.75);
+  border-bottom: 2px solid rgba(255, 194, 209, 0.75);
+  transform: rotate(45deg);
+  border-radius: 0 0 3px 0;
 }
 
 @keyframes bubble-in {
   from {
     opacity: 0;
-    transform: translate(-50%, -90%);
+    transform: translate(-50%, -80%) scale(0.85);
   }
   to {
     opacity: 1;
-    transform: translate(-50%, -100%);
+    transform: translate(-50%, -100%) scale(1);
   }
 }
 </style>

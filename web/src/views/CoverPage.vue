@@ -67,6 +67,13 @@ onMounted(loadCover)
 <template>
   <div class="cover-page">
     <div class="cover-atmosphere" aria-hidden="true" />
+    <div class="cover-floats" aria-hidden="true">
+      <span class="float float--1">♡</span>
+      <span class="float float--2">✦</span>
+      <span class="float float--3">♡</span>
+      <span class="float float--4">★</span>
+      <span class="float float--5">♡</span>
+    </div>
 
     <div v-if="loading" class="loading">加载中…</div>
 
@@ -75,13 +82,14 @@ onMounted(loadCover)
         <p class="cover-hero__sub">我们在一起</p>
         <h1 class="cover-hero__brand" aria-label="czh and hsj">
           <span class="pair--him">czh</span>
-          <span class="pair__amp">&</span>
+          <span class="pair__amp">♡</span>
           <span class="pair--her">hsj</span>
         </h1>
         <div class="cover-hero__days">
           <span class="stat-num">{{ cover.loveDays }}</span>
-          <span class="cover-hero__days-unit">天</span>
+          <span class="cover-hero__days-unit">天啦</span>
         </div>
+        <p class="cover-hero__tag">每一天都闪闪发光</p>
       </header>
 
       <DollDuoStage mode="cover" />
@@ -120,7 +128,7 @@ onMounted(loadCover)
       <div v-if="showLogin" class="modal-overlay" @click.self="closeLogin">
         <div class="modal">
           <div class="modal__header">
-            <h2 class="modal__title">悄悄登录</h2>
+            <h2 class="modal__title">悄悄登录 ✦</h2>
             <button class="btn btn--text" @click="closeLogin">关闭</button>
           </div>
           <p v-if="loginError" class="error-banner">{{ loginError }}</p>
@@ -147,7 +155,7 @@ onMounted(loadCover)
             :disabled="loginLoading"
             @click="handleLogin"
           >
-            {{ loginLoading ? '登录中…' : '进入我们的空间' }}
+            {{ loginLoading ? '登录中…' : '进入我们的小宇宙' }}
           </button>
         </div>
       </div>
@@ -171,26 +179,40 @@ onMounted(loadCover)
   inset: 0 0 auto 0;
   height: min(78vh, 620px);
   background:
-    linear-gradient(180deg, rgba(244, 246, 250, 0) 48%, #eef1f7 100%),
-    radial-gradient(70% 55% at 82% 22%, rgba(74, 111, 181, 0.45), transparent 62%),
-    radial-gradient(55% 45% at 12% 38%, rgba(26, 26, 31, 0.28), transparent 58%),
-    linear-gradient(155deg, #121218 0%, #1e2a44 42%, #3d629f 78%, #7a9ad0 100%);
-  opacity: 0.34;
+    linear-gradient(180deg, rgba(255, 248, 245, 0) 42%, #fff5f8 100%),
+    radial-gradient(70% 55% at 85% 18%, rgba(255, 143, 171, 0.55), transparent 62%),
+    radial-gradient(55% 45% at 12% 40%, rgba(91, 127, 209, 0.35), transparent 58%),
+    radial-gradient(40% 35% at 50% 60%, rgba(255, 214, 165, 0.4), transparent 70%),
+    linear-gradient(155deg, #1a1a22 0%, #2a3d6a 38%, #6b8fd4 72%, #ffb3c6 100%);
+  opacity: 0.28;
   pointer-events: none;
   z-index: 0;
-  animation: ambience-shift 14s ease-in-out infinite alternate;
+  animation: ambience-shift 12s ease-in-out infinite alternate;
 }
 
-.cover-atmosphere::after {
-  content: '';
+.cover-floats {
   position: absolute;
   inset: 0;
-  background:
-    linear-gradient(115deg, transparent 40%, rgba(255, 255, 255, 0.08) 50%, transparent 60%);
-  mix-blend-mode: soft-light;
+  pointer-events: none;
+  z-index: 0;
+  overflow: hidden;
 }
 
-.cover-page > :not(.cover-atmosphere):not(.login-entry) {
+.float {
+  position: absolute;
+  font-size: 1.1rem;
+  opacity: 0.45;
+  color: var(--blush);
+  animation: float-y 4s ease-in-out infinite;
+}
+
+.float--1 { top: 12%; left: 8%; animation-delay: 0s; color: var(--blush); }
+.float--2 { top: 22%; right: 10%; animation-delay: 0.8s; color: var(--coral); font-size: 0.9rem; }
+.float--3 { top: 48%; left: 6%; animation-delay: 1.4s; font-size: 0.85rem; opacity: 0.35; }
+.float--4 { top: 38%; right: 6%; animation-delay: 0.4s; color: var(--peach); }
+.float--5 { top: 18%; left: 42%; animation-delay: 1.1s; font-size: 0.75rem; opacity: 0.3; }
+
+.cover-page > :not(.cover-atmosphere):not(.cover-floats):not(.login-entry) {
   position: relative;
   z-index: 1;
   margin-left: 20px;
@@ -199,43 +221,46 @@ onMounted(loadCover)
 
 .cover-hero {
   text-align: center;
-  padding: 52px 8px 28px;
-  animation: cover-rise 0.7s ease both;
+  padding: 52px 8px 20px;
+  animation: cover-rise 0.7s cubic-bezier(0.22, 1.2, 0.36, 1) both;
 }
 
 .cover-hero__brand {
   font-family: var(--font-display);
-  font-size: clamp(2.8rem, 12vw, 3.8rem);
+  font-size: clamp(2.9rem, 13vw, 4rem);
   line-height: 1.12;
-  margin-bottom: 26px;
-  font-weight: 600;
+  margin-bottom: 22px;
+  font-weight: 400;
   display: flex;
   align-items: baseline;
   justify-content: center;
-  gap: 0.35em;
+  gap: 0.28em;
 }
 
 .pair--him {
   color: var(--him);
-  text-shadow: 0 8px 28px rgba(26, 26, 31, 0.12);
+  text-shadow: 0 6px 0 rgba(26, 26, 31, 0.06);
+  animation: wiggle 3.5s ease-in-out infinite;
 }
 
 .pair--her {
   color: var(--coral-deep);
-  text-shadow: 0 8px 28px rgba(42, 74, 140, 0.18);
+  text-shadow: 0 6px 0 rgba(61, 95, 173, 0.1);
+  animation: wiggle 3.5s ease-in-out infinite reverse;
 }
 
 .pair__amp {
-  color: var(--ink-muted);
-  font-weight: 500;
-  font-size: 0.72em;
+  color: var(--blush);
+  font-size: 0.55em;
+  animation: heart-pulse 1.8s ease-in-out infinite;
 }
 
 .cover-hero__sub {
   font-size: 0.8125rem;
   color: var(--ink-muted);
-  letter-spacing: 0.32em;
-  margin-bottom: 14px;
+  letter-spacing: 0.36em;
+  margin-bottom: 12px;
+  font-weight: 700;
 }
 
 .cover-hero__days {
@@ -243,18 +268,32 @@ onMounted(loadCover)
   align-items: baseline;
   justify-content: center;
   gap: 6px;
-  padding: 14px 28px 12px;
+  padding: 14px 30px 12px;
   border-radius: 999px;
-  background: rgba(255, 255, 255, 0.55);
-  border: 1px solid rgba(42, 74, 140, 0.14);
-  box-shadow: 0 10px 30px rgba(20, 20, 28, 0.06);
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.9), rgba(255, 238, 242, 0.85));
+  border: 2px solid rgba(255, 194, 209, 0.7);
+  box-shadow: 0 6px 0 rgba(255, 143, 171, 0.18), 0 14px 28px rgba(91, 127, 209, 0.1);
   backdrop-filter: blur(8px);
+  animation: heart-pulse 3.5s ease-in-out infinite;
+}
+
+.cover-hero__days .stat-num {
+  background: linear-gradient(120deg, var(--him), var(--blush), var(--coral-deep));
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
 }
 
 .cover-hero__days-unit {
   font-family: var(--font-display);
-  font-size: 1.2rem;
-  color: var(--coral-deep);
+  font-size: 1.25rem;
+  color: var(--blush);
+}
+
+.cover-hero__tag {
+  margin-top: 14px;
+  font-size: 0.8rem;
+  color: var(--ink-muted);
   font-weight: 600;
 }
 
@@ -263,10 +302,11 @@ onMounted(loadCover)
 }
 
 .cover-next__title {
-  font-size: 1.05rem;
-  font-weight: 500;
+  font-size: 1.08rem;
+  font-weight: 700;
   margin-bottom: 4px;
   color: var(--him);
+  font-family: var(--font-display);
 }
 
 .cover-next__meta {
@@ -296,14 +336,19 @@ onMounted(loadCover)
   width: 148px;
   height: 148px;
   object-fit: cover;
-  border-radius: var(--radius-sm);
-  box-shadow: var(--shadow);
-  border: 1px solid rgba(255, 255, 255, 0.5);
+  border-radius: 18px;
+  box-shadow: 0 8px 18px rgba(255, 143, 171, 0.2);
+  border: 3px solid #fff;
   transition: transform 0.25s ease;
+  transform: rotate(-1.5deg);
+}
+
+.featured-item:nth-child(even) img {
+  transform: rotate(1.8deg);
 }
 
 .featured-item:active img {
-  transform: scale(0.98);
+  transform: rotate(0deg) scale(0.98);
 }
 
 .featured-caption {
@@ -320,46 +365,48 @@ onMounted(loadCover)
   bottom: calc(24px + env(safe-area-inset-bottom, 0px));
   right: 20px;
   z-index: 20;
-  width: 42px;
-  height: 42px;
+  width: 46px;
+  height: 46px;
   border-radius: 50%;
-  background: rgba(255, 255, 255, 0.78);
-  border: 1px solid rgba(26, 26, 31, 0.1);
-  box-shadow: 0 8px 24px rgba(20, 20, 28, 0.08);
+  background: linear-gradient(160deg, #fff, #ffeef2);
+  border: 2px solid rgba(255, 194, 209, 0.7);
+  box-shadow: 0 5px 0 rgba(255, 143, 171, 0.2);
   display: flex;
   align-items: center;
   justify-content: center;
-  opacity: 0.6;
+  opacity: 0.75;
   transition: opacity 0.2s, transform 0.2s;
   margin: 0 !important;
+  animation: float-y 3s ease-in-out infinite;
 }
 
 .login-entry:active {
   opacity: 1;
-  transform: scale(0.96);
+  transform: scale(0.94);
+  animation: none;
 }
 
 .login-entry__dot {
-  width: 8px;
-  height: 8px;
+  width: 10px;
+  height: 10px;
   border-radius: 50%;
-  background: linear-gradient(135deg, var(--him) 35%, var(--coral) 100%);
-  box-shadow: 0 0 0 3px rgba(74, 111, 181, 0.15);
+  background: linear-gradient(135deg, var(--blush) 0%, var(--coral) 100%);
+  box-shadow: 0 0 0 4px rgba(255, 143, 171, 0.2);
 }
 
 @keyframes cover-rise {
   from {
     opacity: 0;
-    transform: translateY(16px);
+    transform: translateY(18px) scale(0.98);
   }
   to {
     opacity: 1;
-    transform: translateY(0);
+    transform: translateY(0) scale(1);
   }
 }
 
 @keyframes ambience-shift {
   from { filter: saturate(1) hue-rotate(0deg); }
-  to { filter: saturate(1.08) hue-rotate(-6deg); }
+  to { filter: saturate(1.12) hue-rotate(-8deg); }
 }
 </style>
