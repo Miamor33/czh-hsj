@@ -445,21 +445,22 @@ onUnmounted(revokePreviews)
 .thumb-add {
   width: 80px;
   height: 80px;
-  border-radius: var(--radius-sm);
-  border: 1.5px dashed rgba(201, 109, 92, 0.45);
-  background: rgba(224, 139, 122, 0.06);
+  border-radius: 16px;
+  border: 2px dashed rgba(255, 143, 171, 0.55);
+  background: linear-gradient(160deg, rgba(255, 194, 209, 0.2), rgba(168, 189, 232, 0.15));
   color: var(--coral-deep);
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
   gap: 2px;
-  transition: background 0.15s, border-color 0.15s;
+  transition: background 0.15s, border-color 0.15s, transform 0.15s;
 }
 
 .thumb-add:active {
-  background: rgba(224, 139, 122, 0.14);
-  border-color: var(--coral);
+  background: rgba(255, 143, 171, 0.22);
+  border-color: var(--blush);
+  transform: scale(0.96);
 }
 
 .thumb-add__plus {

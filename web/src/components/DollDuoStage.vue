@@ -167,18 +167,22 @@ function resetCameras() {
 }
 
 .duo__ctrl {
-  padding: 3px 8px;
-  font-size: 0.68rem;
+  padding: 4px 10px;
+  font-size: 0.7rem;
+  font-weight: 700;
   line-height: 1.3;
-  color: var(--ink-muted);
-  background: rgba(255, 255, 255, 0.72);
-  border: 1px solid rgba(26, 26, 31, 0.08);
+  color: var(--coral-deep);
+  background: linear-gradient(160deg, rgba(255, 255, 255, 0.92), rgba(255, 238, 242, 0.88));
+  border: 1.5px solid rgba(255, 194, 209, 0.65);
   border-radius: 999px;
   backdrop-filter: blur(8px);
+  box-shadow: 0 3px 0 rgba(255, 143, 171, 0.18);
 }
 
 .duo__ctrl:active {
-  color: var(--coral-deep);
+  color: var(--blush);
+  transform: translateY(1px);
+  box-shadow: 0 1px 0 rgba(255, 143, 171, 0.18);
 }
 
 .duo__stage--equal {
