@@ -22,20 +22,18 @@ public class DataInitializer implements ApplicationRunner {
     private final PartnerMapper partnerMapper;
     private final SettingMapper settingMapper;
     private final AnniversaryMapper anniversaryMapper;
-    private final QaQuestionMapper qaQuestionMapper;
     private final ChallengeModuleMapper challengeModuleMapper;
     private final ChallengeItemMapper challengeItemMapper;
 
     public DataInitializer(CoupleProperties properties, PasswordEncoder passwordEncoder,
                            PartnerMapper partnerMapper, SettingMapper settingMapper,
-                           AnniversaryMapper anniversaryMapper, QaQuestionMapper qaQuestionMapper,
+                           AnniversaryMapper anniversaryMapper,
                            ChallengeModuleMapper challengeModuleMapper, ChallengeItemMapper challengeItemMapper) {
         this.properties = properties;
         this.passwordEncoder = passwordEncoder;
         this.partnerMapper = partnerMapper;
         this.settingMapper = settingMapper;
         this.anniversaryMapper = anniversaryMapper;
-        this.qaQuestionMapper = qaQuestionMapper;
         this.challengeModuleMapper = challengeModuleMapper;
         this.challengeItemMapper = challengeItemMapper;
     }
@@ -45,7 +43,6 @@ public class DataInitializer implements ApplicationRunner {
         seedPartners();
         seedSettings();
         seedAnniversaries();
-        seedQuestions();
         seedChallenges();
     }
 
@@ -83,10 +80,6 @@ public class DataInitializer implements ApplicationRunner {
         a.setYearly(true);
         a.setCreatedAt(LocalDateTime.now());
         anniversaryMapper.insert(a);
-    }
-
-    private void seedQuestions() {
-        // 题库由 SukiQaImportRunner 一次性导入，此处不再种占位题
     }
 
     private void seedChallenges() {

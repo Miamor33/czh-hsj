@@ -13,6 +13,8 @@ export default defineConfig({
   ],
   server: {
     host: true,
+    // 允许 Cloudflare Tunnel 的公网 Host（*.trycloudflare.com / 自定义域名）
+    allowedHosts: true,
     proxy: {
       '/api': {
         target: 'http://localhost:8080',

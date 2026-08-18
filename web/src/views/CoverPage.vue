@@ -57,6 +57,8 @@ async function handleLogin() {
 
 function formatDaysLeft(days) {
   if (days === 0) return '就是今天'
+  // 不重复且已过期：显示「X 天前」
+  if (days < 0) return `已经过去 ${Math.abs(days)} 天`
   if (days === 1) return '还有 1 天'
   return `还有 ${days} 天`
 }

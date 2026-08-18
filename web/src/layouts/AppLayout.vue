@@ -39,10 +39,19 @@ function logout() {
 const audioRef = ref(null)
 /** 用户期望有声；被浏览器拦截或主动静音时为 false */
 const soundOn = ref(true)
+/** 背景音乐默认音量（0~1），略低于浏览器默认的 1.0 */
+const DEFAULT_BGM_VOLUME = 0.28
+
+function applyBgmVolume(audio) {
+  if (audio) {
+    audio.volume = DEFAULT_BGM_VOLUME
+  }
+}
 
 async function tryPlay() {
   const audio = audioRef.value
   if (!audio) return false
+  applyBgmVolume(audio)
   audio.muted = !soundOn.value
   try {
     await audio.play()

@@ -139,6 +139,8 @@ function moduleProgress(m) {
 
 function formatDaysLeft(days) {
   if (days === 0) return '今天'
+  // 不重复且已过期：显示「X 天前」，避免出现「-X 天后」
+  if (days < 0) return `${Math.abs(days)} 天前`
   return `${days} 天后`
 }
 

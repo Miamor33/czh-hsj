@@ -69,6 +69,8 @@ public class AnniversaryService {
                     m.put("yearly", a.getYearly());
                     return m;
                 })
+                // 「下一个」只看今天及未来；已过期且不重复的不参与
+                .filter(m -> (Long) m.get("daysLeft") >= 0)
                 .min(Comparator.comparingLong(m -> (Long) m.get("daysLeft")))
                 .orElse(null);
     }
@@ -87,7 +89,13 @@ public class AnniversaryService {
                     m.put("yearly", a.getYearly());
                     return m;
                 })
-                .sorted(Comparator.comparingLong(m -> (Long) m.get("daysLeft")))
+                // 未来在前；已过期（不重复）按「距今更近」排在后面
+                .sorted(Comparator
+                        .comparing((Map<String, Object> m) -> (Long) m.get("daysLeft") < 0)
+                        .thenComparingLong(m -> {
+                            long d = (Long) m.get("daysLeft");
+                            return d >= 0 ? d : -d;
+                        }))
                 .toList();
     }
 
